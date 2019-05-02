@@ -2,9 +2,9 @@
 app.controller('usersEditController', ['$scope', '$location', 'userService', '$routeParams', function ($scope, $location, userService, $routeParams) {
 
     $scope.init = function () {
-        $scope.userId = $routeParams.userId;
+            this.userId = $routeParams.userId;
 
-        userService.getUserById($routeParams.userId).then(function (results) {
+            userService.getUserById($routeParams.userId).then(function (results) {
 
             $scope.editUserData = results.data;
 

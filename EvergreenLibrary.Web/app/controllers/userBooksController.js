@@ -7,15 +7,13 @@ app.controller('userBooksController', ['$scope', '$element', '$timeout', 'userBo
 
     $scope.message = "";
 
-    $timeout(function () {
-        userBooksService.getUserBooks($scope.userId).then(function (results) {
+        userBooksService.getUserBooks(this.userId).then(function (results) {
 
             $scope.userBooks = results.data;
 
         }, function (error) {
             $scope.message = error.data.message;
         });
-    });
 
     $scope.readBook = function (id) {
         var bookId = $scope.userBooks[id].id;

@@ -47,7 +47,7 @@ app.config(function ($routeProvider) {
     });
 
     $routeProvider.when('/accounts/users/:userId/edit', {
-        controller: "usersEditController",
+        controller: "usersEditController as ctrl",
         templateUrl: "/app/views/userEdit.html"
     });
 
