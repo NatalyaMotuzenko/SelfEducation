@@ -1,0 +1,34 @@
+﻿<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <h4 class="text-center" permission="true" permission-role="Customer">List of {{authentication.userName}} books</h4>
+        <div data-ng-hide="message == ''" class="alert alert-danger">
+            {{message}}
+        </div>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Year</th>
+                    <th  permission="true" permission-role="Customer">Read</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="book in userBooks" data-ng-class="(book.state==='free') ? 'success' : 'danger'" ng-hide="(book.state!==userName) && userId===''">
+                    <td>
+                        {{ book.title }}
+                    </td>
+                    <td>
+                        {{ book.author }}
+                    </td>
+                    <td>
+                        {{ book.year }}
+                    </td>
+                    <td  permission="true" permission-role="Customer">
+                        <button type="button" class="btn btn-info center-block" ng-show="(book.state===userName)" data-ng-click="returnBook($index)">Return</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

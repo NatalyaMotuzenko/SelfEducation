@@ -1,0 +1,10 @@
+﻿<form class="form-add" role="form">
+    <h2 class="form-add-heading">Add book</h2>
+    <input type="text" class="form-control" placeholder="Title" data-ng-model="addBookData.title" required autofocus>
+    <input type="text" class="form-control" placeholder="Author" data-ng-model="addBookData.author">
+    <input type="number" class="form-control" placeholder="Year" data-ng-model="addBookData.year" required>
+    <button class="btn btn-lg btn-info btn-block" type="submit" data-ng-click="addBook()">Add</button>
+    <div data-ng-hide="message == ''" class="alert alert-danger">
+        {{message}}
+    </div>
+</form>

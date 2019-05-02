@@ -1,0 +1,19 @@
+﻿<form class="form-add" role="form">
+    <h2 class="form-add-heading">Edit user</h2>
+    <input type="text" class="form-control" placeholder="Id" data-ng-model="editUserData.id" required disabled="disabled">
+    <input type="text" class="form-control" placeholder="Email" data-ng-model="editUserData.email" required autofocus>
+    <input type="text" class="form-control" placeholder="First Name" data-ng-model="editUserData.firstName" required>
+    <input type="text" class="form-control" placeholder="Last Name" data-ng-model="editUserData.LastName" required>
+    <select class="form-control" data-ng-model="editUserData.roles[0]">
+        <option value="Customer">Customer</option>
+        <option value="Librarian">Librarian</option>
+        <option value="Admin">Admin</option>
+    </select>
+    <input type="password" class="form-control" placeholder="Password" data-ng-model="editUserData.password" required>
+    <button class="btn btn-lg btn-success btn-block" type="submit" data-ng-click="editUser()">Edit</button>
+    <div data-ng-hide="message == ''" class="alert alert-danger">
+        {{message}}
+    </div>
+</form>
+
+<user-books user-id="userId"></user-books>

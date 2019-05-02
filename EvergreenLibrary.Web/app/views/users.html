@@ -1,0 +1,43 @@
+﻿<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <h4 class="text-center">List of users</h4>
+        <div data-ng-hide="message == ''" class="alert alert-danger">
+            {{message}}
+        </div>
+        <a href="#/accounts/add" class="btn btn-add btn-info pull-right" role="button">Add User</a>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th permission="true">Edit</th>
+                    <th permission="true">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="user in users">
+                    <td>
+                        {{ user.firstName }}
+                    </td>
+                    <td>
+                        {{ user.lastName }}
+                    </td>
+                    <td>
+                        {{ user.email }}
+                    </td>
+                    <td>
+                        {{ user.roles[0] }}
+                    </td>
+                    <td>
+                        <a href="#/accounts/users/{{user.id}}/edit" class="btn btn-success center-block" role="button"><span class="glyphicon glyphicon-pencil"></span></a>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger center-block" data-ng-click="deleteUser($index)"><span class="glyphicon glyphicon-trash"></span></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

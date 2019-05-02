@@ -1,0 +1,11 @@
+﻿<form class="form-add" role="form">
+    <h2 class="form-add-heading">Edit book</h2>
+    <input type="text" class="form-control" placeholder="Id" data-ng-model="editBookData.id" required disabled="disabled">
+    <input type="text" class="form-control" placeholder="Title" data-ng-model="editBookData.title" required autofocus>
+    <input type="text" class="form-control" placeholder="Author" data-ng-model="editBookData.author">
+    <input type="number" class="form-control" placeholder="Year" data-ng-model="editBookData.year" required>
+    <button class="btn btn-lg btn-success btn-block" type="submit" data-ng-click="editBook()">Edit</button>
+    <div data-ng-hide="message == ''" class="alert alert-danger">
+        {{message}}
+    </div>
+</form>
