@@ -12,7 +12,7 @@ namespace EvergreenLibrary.Providers
 {
     public class CustomJwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
-
+        private const string ParamName = "data";
         private readonly string _issuer = string.Empty;
 
         public CustomJwtFormat(string issuer)
@@ -25,7 +25,7 @@ namespace EvergreenLibrary.Providers
         {
             if (data == null)
             {
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(ParamName);
             }
 
             string audienceId = ConfigurationManager.AppSettings["as:AudienceId"];

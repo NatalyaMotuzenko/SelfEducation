@@ -63,7 +63,7 @@ namespace EvergreenLibrary
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
-        //API настроен на доверенные токены, выпущенные только нашим сервером авторизации
+        ////API настроен на доверенные токены, выпущенные только нашим сервером авторизации
         private void ConfigureOAuthTokenConsumption(IAppBuilder app)
         {
 

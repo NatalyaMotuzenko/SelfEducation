@@ -17,7 +17,7 @@ namespace EvergreenLibrary.Infrastructure
         public string Title { get; set; }
         public string Author { get; set; }
 
-        [checkYear]
+        [CheckYear]
         public int Year { get; set; } = Convert.ToInt32(DateTime.Now.Year);
         public bool NeedToDelete { get; set; } = false;
         public string ApplicationUserId { get; set; }

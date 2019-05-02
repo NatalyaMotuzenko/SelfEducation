@@ -47,7 +47,7 @@ namespace EvergreenLibrary.Models
 
         public BookReturnModel Create(Book appBook)
         {
-            var state = appBook.ApplicationUser != null ? appBook.ApplicationUser.FirstName + " " + appBook.ApplicationUser.LastName : "free";
+            var state = appBook.ApplicationUser != null ? appBook.ApplicationUser.Email : "free";
             return new BookReturnModel
             {
                 //Url = _UrlHelper.Link("GetBookById", new { id = appBook.Id }),

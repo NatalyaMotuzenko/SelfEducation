@@ -30,7 +30,7 @@ namespace EvergreenLibrary.Providers
 
             var userManager = context.OwinContext.GetUserManager<ApplicationUserManager>();
 
-            ApplicationUser user = await userManager.FindAsync(context.UserName, context.Password);
+            ApplicationUser user = await userManager.FindAsync(context.UserName, context.Password).ConfigureAwait(false);
 
             if (user == null)
             {
@@ -45,7 +45,7 @@ namespace EvergreenLibrary.Providers
             }
 
             //если учетные данные действительны и электронная почта подтверждена, мы создаем удостоверение для вошедшего в систему пользователя, это Идентификатор будет содержать все роли и утверждения для аутентифицированного пользователя
-            ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, "JWT");
+            ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, "JWT").ConfigureAwait(false);
 
             var ticket = new AuthenticationTicket(oAuthIdentity, null);
 

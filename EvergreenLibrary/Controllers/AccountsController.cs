@@ -4,12 +4,9 @@ using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Transactions;
-using Microsoft.AspNet.Identity.Owin;
 using System.Data.Entity.Infrastructure;
 
 namespace EvergreenLibrary.Controllers
@@ -28,9 +25,9 @@ namespace EvergreenLibrary.Controllers
 
         [Authorize(Roles = "Admin")]
         [Route("user/{id:guid}", Name = "GetUserById")]
-        public async Task<IHttpActionResult> GetUser(string Id)
+        public async Task<IHttpActionResult> GetUserById(string Id)
         {
-            var user = await this.AppUserManager.FindByIdAsync(Id);
+            var user = await AppUserManager.FindByIdAsync(Id).ConfigureAwait(false);
 
             if (user != null)
             {
@@ -45,7 +42,7 @@ namespace EvergreenLibrary.Controllers
         [Route("user/{username}")]
         public async Task<IHttpActionResult> GetUserByName(string username)
         {
-            var user = await this.AppUserManager.FindByNameAsync(username);
+            var user = await AppUserManager.FindByNameAsync(username).ConfigureAwait(false);
 
             if (user != null)
             {
@@ -57,7 +54,7 @@ namespace EvergreenLibrary.Controllers
         }
 
         [AllowAnonymous]
-        [Route("")]
+        [Route("", Name = "Register")]
         public async Task<IHttpActionResult> PostUser(CreateUserBindingModel createUserModel)
         {
             if (!ModelState.IsValid)
@@ -79,7 +76,7 @@ namespace EvergreenLibrary.Controllers
 
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                IdentityResult addUserResult = await this.AppUserManager.CreateAsync(user, createUserModel.Password);
+                IdentityResult addUserResult = await AppUserManager.CreateAsync(user, createUserModel.Password).ConfigureAwait(false);
 
                 if (!addUserResult.Succeeded)
                 {
@@ -87,20 +84,20 @@ namespace EvergreenLibrary.Controllers
                 }
 
                 //add role
-                IdentityResult addResult = await this.AppUserManager.AddToRolesAsync(user.Id, createUserModel.RoleName);
+                IdentityResult addResult = await AppUserManager.AddToRolesAsync(user.Id, createUserModel.RoleName).ConfigureAwait(false);
 
                 if (!addResult.Succeeded)
                 {
-                    ModelState.AddModelError("", "Failed to add user roles");
+                    ModelState.AddModelError(string.Empty, "Failed to add user roles");
                     return BadRequest(ModelState);
                 }
 
                 //send email
-                string code = await this.AppUserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                string code = await AppUserManager.GenerateEmailConfirmationTokenAsync(user.Id).ConfigureAwait(false);
 
                 var callbackUrl = new Uri(Url.Link("ConfirmEmailRoute", new { userId = user.Id, code = code }));
 
-                await this.AppUserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                await AppUserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>").ConfigureAwait(false);
                 scope.Complete();
             }
             //return the resource created in the location header and return 201 created status (хорошая практика)
@@ -117,7 +114,7 @@ namespace EvergreenLibrary.Controllers
                 return BadRequest(ModelState);
             }
 
-            IdentityResult result = await this.AppUserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+            IdentityResult result = await AppUserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword).ConfigureAwait(false);
 
             if (!result.Succeeded)
             {
@@ -157,11 +154,15 @@ namespace EvergreenLibrary.Controllers
                     }
                     catch (DbUpdateConcurrencyException)
                     {
+                        scope.Complete();
                         return BadRequest();
                     }
+                    finally
+                    {
+                        scope.Complete();
+                    }
                 }
-
-                if (books.Count!=0)
+                if (books.Count != 0)
                     return Ok(books.ToList().Select(u => this.TheModelFactory.Create(u)));
                 else
                     return Ok();
@@ -179,11 +180,11 @@ namespace EvergreenLibrary.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
-                ModelState.AddModelError("", "User Id and Code are required");
+                ModelState.AddModelError(string.Empty, "User Id and Code are required");
                 return BadRequest(ModelState);
             }
 
-            IdentityResult result = await this.AppUserManager.ConfirmEmailAsync(userId, code);
+            IdentityResult result = await AppUserManager.ConfirmEmailAsync(userId, code).ConfigureAwait(false);
 
             if (result.Succeeded)
             {
@@ -202,37 +203,37 @@ namespace EvergreenLibrary.Controllers
         public async Task<IHttpActionResult> AssignRolesToUser([FromUri] string id, [FromBody] string[] rolesToAssign)
         {
 
-            var appUser = await this.AppUserManager.FindByIdAsync(id);
+            var appUser = await AppUserManager.FindByIdAsync(id).ConfigureAwait(false);
 
             if (appUser == null)
             {
                 return NotFound();
             }
 
-            var currentRoles = await this.AppUserManager.GetRolesAsync(appUser.Id);
+            var currentRoles = await AppUserManager.GetRolesAsync(appUser.Id).ConfigureAwait(false);
 
             var rolesNotExists = rolesToAssign.Except(this.AppRoleManager.Roles.Select(x => x.Name)).ToArray();
 
             if (rolesNotExists.Count() > 0)
             {
 
-                ModelState.AddModelError("", string.Format("Roles '{0}' does not exixts in the system", string.Join(",", rolesNotExists)));
+                ModelState.AddModelError(string.Empty, errorMessage: $"Roles '{string.Join(",", rolesNotExists)}' does not exixts in the system");
                 return BadRequest(ModelState);
             }
 
-            IdentityResult removeResult = await this.AppUserManager.RemoveFromRolesAsync(appUser.Id, currentRoles.ToArray());
+            IdentityResult removeResult = await AppUserManager.RemoveFromRolesAsync(appUser.Id, currentRoles.ToArray()).ConfigureAwait(false);
 
             if (!removeResult.Succeeded)
             {
-                ModelState.AddModelError("", "Failed to remove user roles");
+                ModelState.AddModelError(string.Empty, "Failed to remove user roles");
                 return BadRequest(ModelState);
             }
 
-            IdentityResult addResult = await this.AppUserManager.AddToRolesAsync(appUser.Id, rolesToAssign);
+            IdentityResult addResult = await AppUserManager.AddToRolesAsync(appUser.Id, rolesToAssign).ConfigureAwait(false);
 
             if (!addResult.Succeeded)
             {
-                ModelState.AddModelError("", "Failed to add user roles");
+                ModelState.AddModelError(string.Empty, "Failed to add user roles");
                 return BadRequest(ModelState);
             }
 

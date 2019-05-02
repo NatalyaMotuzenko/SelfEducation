@@ -26,7 +26,7 @@ namespace EvergreenLibrary.Infrastructure
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                appUserManager.UserTokenProvider = new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"))
+                appUserManager.UserTokenProvider = new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("Library"))
                 {
                     //Code for email confirmation and reset password life time
                     TokenLifespan = TimeSpan.FromHours(6)

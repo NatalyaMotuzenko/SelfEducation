@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -24,14 +25,14 @@ namespace EvergreenLibrary.Controllers
         [Route("", Name = "GetAllBooks")]
         public IHttpActionResult GetBooks()
         {
-            return Ok(db.Books.ToList().Where((book)=>book.NeedToDelete==false).Select(b => this.TheModelFactory.Create(b)));
+            return Ok(db.Books.ToList().Where((book) => book.NeedToDelete == false).Select(b => this.TheModelFactory.Create(b)));
         }
 
         [Authorize(Roles = "Librarian")]
         [Route("{id}", Name = "GetBookById")]
         public async Task<IHttpActionResult> GetBook(int id)
         {
-            Book book = await db.Books.FindAsync(id);
+            Book book = await db.Books.FindAsync(id).ConfigureAwait(false);
             if (book == null)
             {
                 return NotFound();
@@ -48,7 +49,7 @@ namespace EvergreenLibrary.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Book book = await db.Books.FindAsync(putBook.Id);
+            Book book = await db.Books.FindAsync(putBook.Id).ConfigureAwait(false);
             book.Title = putBook.Title;
             book.Author = putBook.Author;
             book.Year = putBook.Year;
@@ -62,7 +63,7 @@ namespace EvergreenLibrary.Controllers
 
             try
             {
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -94,7 +95,23 @@ namespace EvergreenLibrary.Controllers
             };
 
             db.Books.Add(book);
-            await db.SaveChangesAsync();
+            try
+            {
+                await db.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbEntityValidationException ex)
+            {
+                string errorResult = "";
+                foreach (DbEntityValidationResult validationError in ex.EntityValidationErrors)
+                {
+                    foreach (DbValidationError err in validationError.ValidationErrors)
+                    {
+                        errorResult+= err.ErrorMessage + "";
+                    }
+                }
+                return BadRequest(errorResult);
+            }
+
 
             Uri locationHeader = new Uri(Url.Link("GetBookById", new { id = book.Id }));
 
@@ -105,7 +122,7 @@ namespace EvergreenLibrary.Controllers
         [Route("{id}")]
         public async Task<IHttpActionResult> DeleteBook(int id)
         {
-            Book book = await db.Books.FindAsync(id);
+            Book book = await db.Books.FindAsync(id).ConfigureAwait(false);
             if (book == null)
             {
                 return NotFound();
@@ -117,7 +134,7 @@ namespace EvergreenLibrary.Controllers
 
                 try
                 {
-                    await db.SaveChangesAsync();
+                    await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -135,7 +152,7 @@ namespace EvergreenLibrary.Controllers
             else
             {
                 db.Books.Remove(book);
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync().ConfigureAwait(false);
             }
             return Ok(book);
         }

@@ -25,7 +25,7 @@ namespace EvergreenLibrary.Infrastructure
         //получение аутентифицированного идентификатора пользователя
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
-            var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);
+            var userIdentity = await manager.CreateIdentityAsync(this, authenticationType).ConfigureAwait(false);
             // Add custom user claims here
             return userIdentity;
         }

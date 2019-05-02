@@ -1,4 +1,5 @@
 ﻿using EvergreenLibrary.Infrastructure;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -11,16 +12,18 @@ using System.Web.Http;
 
 namespace EvergreenLibrary.Controllers
 {
-    [Authorize(Roles = "Customer")]
-    [RoutePrefix("api/users/{userId}/books")]
+    [Authorize(Roles = "Customer,Admin")]
+    [RoutePrefix("api/users/books")]
     public class UsersBooksController : BaseApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        [Route("", Name = "GetAllUserBooks")]
-        public async Task<IHttpActionResult> GetBooks(string userId)
+        [Route("{userId?}", Name = "GetAllUserBooks")]
+        public async Task<IHttpActionResult> GetBooks(string userId = null)
         {
-            var user = await this.AppUserManager.FindByIdAsync(userId);
+            if(userId==null)
+                userId = User.Identity.GetUserId();
+            var user = await AppUserManager.FindByIdAsync(userId).ConfigureAwait(false);
             if (user == null)
             {
                 return NotFound();
@@ -30,14 +33,15 @@ namespace EvergreenLibrary.Controllers
         }
 
         [Route("{id}", Name = "PutUserBook")]
-        public async Task<IHttpActionResult> PutUserBook(string userId, int id,[FromUri] bool take)
+        public async Task<IHttpActionResult> PutUserBook (int id,[FromUri] bool take)
         {
-            var user = await this.AppUserManager.FindByIdAsync(userId);
+            var userId = User.Identity.GetUserId();
+            var user = await AppUserManager.FindByIdAsync(userId).ConfigureAwait(false);
             if (user == null)
             {
                 return NotFound();
             }
-            Book book = await db.Books.FindAsync(id);
+            Book book = await db.Books.FindAsync(id).ConfigureAwait(false);
             if (book == null)
             {
                 return NotFound();
@@ -51,7 +55,7 @@ namespace EvergreenLibrary.Controllers
                 if (book.NeedToDelete == true)
                 {
                     db.Books.Remove(book);
-                    await db.SaveChangesAsync();
+                    await db.SaveChangesAsync().ConfigureAwait(false);
                     return Ok();
                 }
                 book.ApplicationUserId = null;
@@ -70,7 +74,7 @@ namespace EvergreenLibrary.Controllers
 
             try
             {
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (DbUpdateConcurrencyException)
             {

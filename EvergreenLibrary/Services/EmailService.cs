@@ -10,10 +10,10 @@ namespace EvergreenLibrary.Services
 {
     public class EmailService : IIdentityMessageService
     {
-        //внедрить службу электронной почты или SMS в методе «SendAsync»
+        ////внедрить службу электронной почты или SMS в методе «SendAsync»
         public async Task SendAsync(IdentityMessage message)
         {
-            await configSendGridasync(message);
+            await configSendGridasync(message).ConfigureAwait(false);
         }
 
         private async Task configSendGridasync(IdentityMessage message)
@@ -26,7 +26,7 @@ namespace EvergreenLibrary.Services
             myMessage.Text = message.Body;
             myMessage.Html = message.Body;
 
-            var credentials = new NetworkCredential("Natalia.Lytovchenko", "Candycola1199");
+            var credentials = new NetworkCredential("Natalia.Lytovchenko.1884", "Candycola1199");
 
             // Create a Web transport for sending email.
             var transportWeb = new Web(credentials);
@@ -34,12 +34,12 @@ namespace EvergreenLibrary.Services
             // Send the email.
             if (transportWeb != null)
             {
-                await transportWeb.DeliverAsync(myMessage);
+                await transportWeb.DeliverAsync(myMessage).ConfigureAwait(false);
             }
             else
             {
-                //Trace.TraceError("Failed to create Web transport.");
-                await Task.FromResult(0);
+                ////Trace.TraceError("Failed to create Web transport.");
+                await Task.FromResult(0).ConfigureAwait(false);
             }
         }
     }

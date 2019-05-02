@@ -69,7 +69,7 @@ namespace EvergreenLibrary.Migrations
 
             manager.AddToRoles(customerUser.Id, new string[] { "Customer" });
 
-            context.Books.AddOrUpdate(x => x.Id,
+            context.Books.AddOrUpdate( x => x.Id,
                 new Book()
                 {
                     Title = "Pride and Prejudice",
